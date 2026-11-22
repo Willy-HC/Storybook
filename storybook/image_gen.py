@@ -28,7 +28,7 @@ class ImageGenerator:
             pipe = StableDiffusionPipeline.from_pretrained(cfg.model_id, variant="fp16", **kwargs)
         except (ValueError, OSError):
             pipe = StableDiffusionPipeline.from_pretrained(cfg.model_id, **kwargs)
-        pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config, use_karras_sigmas=True)
+        pipe.scheduler = DPMSolverMultistepScheduler.from_config(pipe.scheduler.config,algorithm_type="dpmsolver++",final_sigmas_type="zero",use_karras_sigmas=True)
         if cfg.strategy == "ip_adapter":
             pipe.load_ip_adapter(cfg.ip_adapter_repo, subfolder="models", weight_name=cfg.ip_adapter_weight)
             pipe.set_ip_adapter_scale(cfg.ip_adapter_scale)
