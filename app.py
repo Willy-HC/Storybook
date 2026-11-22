@@ -4,7 +4,8 @@ from pathlib import Path
 import streamlit as st
 
 import storybook  # noqa: F401  (fija variables de entorno antes de importar diffusers)
-from storybook.config import GENRES, AppConfig
+from storybook.audio_utils import scaled_wav_bytes
+from storybook.config import GENRES, IMAGE_MODELS, VOICES, AppConfig
 from storybook.pipeline import generate_storybook, list_stories, load_manifest, validate_inputs
 
 st.set_page_config(page_title="Storybook IA", page_icon="📖", layout="wide")
@@ -26,10 +27,16 @@ with st.sidebar:
         ["ip_adapter", "prompt_only"],
         format_func=lambda s: "IP-Adapter + hoja de personaje" if s == "ip_adapter" else "Solo prompt fijo",
     )
-    ip_scale = st.slider("Fuerza IP-Adapter", 0.2, 0.9, 0.6, 0.05, disabled=strategy != "ip_adapter")
+    ip_scale = st.slider("Fuerza IP-Adapter", 0.1, 0.9, 0.35, 0.05, disabled=strategy != "ip_adapter",
+                         help="Más alto = personaje más parecido, pero escenas más repetidas.")
+    image_model = st.selectbox("Modelo de imagen", list(IMAGE_MODELS), format_func=str)
     sound_backend = st.selectbox("Sonido ambiente", ["procedural", "audioldm2"])
     llm_model = st.text_input("Modelo Ollama", "qwen2.5:7b")
     seed = st.number_input("Semilla de imagen", 0, 99999, 1234)
+    st.subheader("🎙️ Voz y volumen")
+    voice_name = st.selectbox("Voz de narración", list(VOICES))
+    speed = st.slider("Velocidad de la voz", 0.7, 1.3, 0.9, 0.05, help="Menor = más rápida; mayor = más lenta.")
+    ambient_gain = st.slider("Volumen del ambiente", 0.1, 1.0, 0.5, 0.05, help="0,5 = la mitad de su volumen.")
     low_vram = st.checkbox("Modo poca VRAM (más lento)", value=False)
     autoplay = st.checkbox("Reproducir audio al cambiar de escena", value=True)
 
@@ -65,6 +72,9 @@ if submitted:
         cfg = AppConfig()
         cfg.image.strategy, cfg.image.ip_adapter_scale = strategy, ip_scale
         cfg.image.seed, cfg.image.low_vram = int(seed), low_vram
+        cfg.image.model_id = IMAGE_MODELS[image_model]
+        cfg.tts.voice_path, cfg.tts.length_scale = VOICES[voice_name], speed
+        cfg.tts.speaker_id = 0 if "Sharvard" in voice_name else None
         cfg.sound.backend, cfg.llm.model = sound_backend, llm_model
         bar = st.progress(0.0, text="Iniciando…")
         try:
@@ -96,7 +106,7 @@ if st.session_state.story_dir:
         st.markdown("**🗣️ Narración**")
         st.audio((base / sc["voice"]).read_bytes(), format="audio/wav", autoplay=autoplay)
         st.markdown(f"**🔊 Ambiente** ({sc['sound_type']})")
-        st.audio((base / sc["ambient"]).read_bytes(), format="audio/wav", loop=True, autoplay=autoplay)
+        st.audio(scaled_wav_bytes(base / sc["ambient"], ambient_gain), format="audio/wav", loop=True, autoplay=autoplay)
 
     b1, b2, _ = st.columns([1, 1, 6])
     b1.button("⬅ Anterior", on_click=go, args=(-1,), disabled=i == 0)

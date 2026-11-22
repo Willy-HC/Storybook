@@ -22,3 +22,22 @@ def write_wav(path, samples: np.ndarray, sr: int) -> Path:
 def wav_duration(path) -> float:
     with wave.open(str(path), "rb") as wf:
         return wf.getnframes() / float(wf.getframerate())
+
+
+def scaled_wav_bytes(path, gain: float) -> bytes:
+    """Devuelve el WAV con su volumen multiplicado por `gain` (0-1), listo para st.audio."""
+    import io
+
+    with wave.open(str(path), "rb") as wf:
+        params = wf.getparams()
+        frames = wf.readframes(wf.getnframes())
+    if params.sampwidth != 2:
+        return Path(path).read_bytes()
+    x = np.frombuffer(frames, dtype="<i2").astype(np.float32) * float(gain)
+    buf = io.BytesIO()
+    with wave.open(buf, "wb") as out:
+        out.setnchannels(params.nchannels)
+        out.setsampwidth(2)
+        out.setframerate(params.framerate)
+        out.writeframes(np.clip(x, -32768, 32767).astype("<i2").tobytes())
+    return buf.getvalue()

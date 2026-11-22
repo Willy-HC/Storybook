@@ -2,7 +2,7 @@
 
 Para cada prueba (idea, género):
   1. Se genera UNA historia con el LLM (la misma para todas las configuraciones).
-  2. Se generan las 5 ilustraciones con cada configuración (p. ej. prompt_only vs ip_adapter:0.6).
+  2. Se generan las 5 ilustraciones con cada configuración (p. ej. prompt_only vs ip_adapter:0.35).
   3. Se miden tiempos y métricas (CLIP, cobertura de personajes) y se guarda una hoja de contacto.
 
 Uso:
@@ -38,7 +38,7 @@ RESULTS = Path(__file__).resolve().parent / "results"
 
 def parse_config(spec: str):
     name, _, scale = spec.partition(":")
-    return name, float(scale) if scale else 0.6
+    return name, float(scale) if scale else 0.35
 
 
 def contact_sheet(paths, label, out):
@@ -52,7 +52,7 @@ def contact_sheet(paths, label, out):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--configs", default="prompt_only,ip_adapter:0.6")
+    ap.add_argument("--configs", default="prompt_only,ip_adapter:0.35")
     ap.add_argument("--tests", type=int, default=len(TESTS))
     ap.add_argument("--full", action="store_true")
     args = ap.parse_args()

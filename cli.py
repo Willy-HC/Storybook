@@ -15,7 +15,7 @@ def main():
     ap.add_argument("--idea", required=True)
     ap.add_argument("--genre", required=True)
     ap.add_argument("--strategy", choices=["prompt_only", "ip_adapter"], default="ip_adapter")
-    ap.add_argument("--ip-scale", type=float, default=0.6)
+    ap.add_argument("--ip-scale", type=float, default=0.35)
     ap.add_argument("--sound-backend", choices=["procedural", "audioldm2"], default="procedural")
     ap.add_argument("--llm-model", default=None)
     ap.add_argument("--seed", type=int, default=1234)

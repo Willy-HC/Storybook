@@ -32,7 +32,7 @@ Ver `docs/ARQUITECTURA.md` (insertar el diagrama). Canal único de información:
 * **Audio/contenido:** la voz lee el texto exacto; el tipo de sonido proviene del mismo JSON de la escena.
 
 ## 6. Configuraciones y experimentos
-Configuraciones comparadas: **A = `prompt_only`**, **B = `ip_adapter` (escala 0,6)** [y otras escalas si las probaste].
+Configuraciones comparadas: **A = `prompt_only`**, **B = `ip_adapter` (escala 0,35)** [y otras escalas si las probaste].
 Misma historia y semilla en ambas, para aislar el efecto de la estrategia.
 
 [PEGAR AQUÍ la tabla de `experiments/results/REPORTE.md`]

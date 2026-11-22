@@ -112,7 +112,7 @@ class ImageGenerator:
 
         if use_ip:
             sheet_prompt = self.build_prompt(
-                [style, "character reference, full body portrait, plain light background", main.visual_description]
+                ["character reference sheet, full body portrait, plain light background", main.visual_description, style, cfg.quality_suffix]
             )
             t0 = time.time()
             sheet_img = self.generate(sheet_prompt, cfg.seed)
@@ -126,14 +126,16 @@ class ImageGenerator:
         for i, scene in enumerate(story.scenes, 1):
             present = [c for c in story.characters if c is main or _first(c.name) in scene.text.lower()]
             chars = ", ".join(c.visual_description for c in present[:2])
-            prompt = self.build_prompt([style, chars, scene.image_action, story.setting, "detailed illustration"])
+            # La acción de la escena va PRIMERO (CLIP da más peso a los primeros tokens y recorta el final).
+            prompt = self.build_prompt([scene.image_action, chars, story.setting, style, cfg.quality_suffix])
+            seed = cfg.seed + i if cfg.vary_seed else cfg.seed
             t0 = time.time()
-            img = self.generate(prompt, cfg.seed, sheet_img, cfg.ip_adapter_scale if use_ip else None)
+            img = self.generate(prompt, seed, sheet_img, cfg.ip_adapter_scale if use_ip else None)
             dt = time.time() - t0
             timings.append(dt)
             path = out_dir / f"scene_{i}.png"
             img.save(path)
-            scenes.append({"index": i, "file": path.name, "prompt": prompt, "seconds": round(dt, 2), "seed": cfg.seed})
+            scenes.append({"index": i, "file": path.name, "prompt": prompt, "seconds": round(dt, 2), "seed": seed})
             if progress:
                 progress(i, len(story.scenes), f"Ilustración {i}/{len(story.scenes)} lista")
         return {

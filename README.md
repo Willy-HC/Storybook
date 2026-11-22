@@ -9,7 +9,7 @@ sin APIs de pago: funciona sin Internet una vez descargados los modelos.
 | Componente | Tecnología local | Licencia (verificar, ver `docs/LICENCIAS.md`) |
 |---|---|---|
 | Historia (LLM) | Ollama + Qwen2.5 7B, salida JSON estructurada | Apache-2.0 |
-| Imágenes | Stable Diffusion 1.5 (`diffusers`) + IP-Adapter | CreativeML OpenRAIL-M / Apache-2.0 |
+| Imágenes | DreamShaper 8 (SD 1.5, `diffusers`) + IP-Adapter | CreativeML OpenRAIL-M / Apache-2.0 |
 | Voz | Piper TTS (voz española) | ver tarjeta de la voz |
 | Sonido | Síntesis procedural propia (NumPy) · opcional AudioLDM2 | código propio MIT / AudioLDM2 no comercial |
 | Interfaz | Streamlit | Apache-2.0 |
@@ -88,10 +88,20 @@ $env:STORYBOOK_OFFLINE = 1
 streamlit run app.py
 ```
 
+## Ajustes de voz, volumen e imágenes
+
+* **Volumen del ambiente:** control en la barra lateral (por defecto 0,5 = la mitad). El ajuste se aplica al reproducir, así que
+  funciona también con cuentos ya generados.
+* **Voz:** elige voz y velocidad en la barra lateral. Para compararlas antes de generar: `python scripts/probar_voces.py`
+  (crea la misma frase con cada voz en `outputs/voces/`). Las voces se definen en `VOICES` de `storybook/config.py`.
+* **Imágenes:** el modelo por defecto es DreamShaper 8 (afinado sobre SD 1.5, compatible con IP-Adapter). Cada escena usa una semilla
+  distinta y la acción de la escena va al inicio del prompt; si las escenas se parecen demasiado, baja «Fuerza IP-Adapter».
+  Tras actualizar ejecuta de nuevo `python scripts/download_models.py` para bajar el modelo y la voz nuevos.
+
 ## Experimentos y evidencias
 
 ```powershell
-python experiments/run_experiments.py                                   # 3 pruebas × (prompt_only vs ip_adapter:0.6)
+python experiments/run_experiments.py                                   # 3 pruebas × (prompt_only vs ip_adapter:0.35)
 python experiments/run_experiments.py --configs prompt_only,ip_adapter:0.4,ip_adapter:0.7
 python experiments/run_experiments.py --full                            # además guarda cuentos completos con voz y sonido
 ```
