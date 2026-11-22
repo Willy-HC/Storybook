@@ -1,0 +1,16 @@
+# Entorno
+.venv/
+venv/
+__pycache__/
+*.pyc
+.env
+.pytest_cache/
+.vscode/
+
+# Modelos y salidas pesadas (se descargan con scripts/download_models.py)
+models/
+outputs/
+
+# Resultados de experimentos: se versionan las imágenes/tablas (evidencia),
+# pero no el audio generado.
+experiments/results/**/*.wav

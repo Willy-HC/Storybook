@@ -1,0 +1,17 @@
+# IMPORTANTE: instala PyTorch con CUDA ANTES (ver README, paso 3):
+#   pip install torch --index-url https://download.pytorch.org/whl/cu124
+#
+# Después:  pip install -r requirements.txt
+diffusers>=0.31.0
+transformers>=4.44.0,<5
+accelerate>=0.33.0
+safetensors>=0.4.3
+huggingface_hub>=0.24.0
+pillow>=10.0.0
+numpy>=1.26
+pydantic>=2.6
+ollama>=0.4.0
+piper-tts>=1.2.0
+streamlit>=1.41.0,<2
+psutil>=5.9
+pytest>=8.0
